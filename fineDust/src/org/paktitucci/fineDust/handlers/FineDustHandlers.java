@@ -42,7 +42,7 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 	        
 			if(message.getText().startsWith("#")) {
 				locationName = message.getText().substring(1);
-				result = Report.getfineDustInfo(locationName);
+				result = Report.getfineDustInfo(locationName.trim());
 				introduceText = userName + "님 " + locationName + "을 등록하였습니다.\n\n";
 				introduceText += result;
 			}

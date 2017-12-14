@@ -7,7 +7,7 @@ public class ResponseTextMaker {
 	private TextProcessable currentProcessor;
 	
 	
-	public String getReturnText(Message message) {
+	public String getResponseText(Message message) {
 		this.currentProcessor = ProcessorList.getCurrentProcessor(message.getText());
 		return this.currentProcessor.processText(message);
 	}

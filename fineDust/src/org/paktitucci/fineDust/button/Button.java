@@ -13,8 +13,8 @@ public class Button {
 	ReplyKeyboardMarkup keyboardMarkup = null;
 
 	public Button(ButtonType buttonType) {
-		keyboardMarkup = new ReplyKeyboardMarkup();
         List<KeyboardRow> keyboard = new ArrayList<>();
+        this.keyboardMarkup = new ReplyKeyboardMarkup();
         
         switch(buttonType) {
         	case INIT : 

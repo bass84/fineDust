@@ -1,5 +1,7 @@
 package org.paktitucci.fineDust.user;
 
+import org.paktitucci.fineDust.model.FineDustInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,14 +12,14 @@ public class User {
 	private String firstName;
 	
 	private String lastName;
-	
-	private List<String> locationNames;
+
+	private List<FineDustInfo> fineDustInfoList;
 	
 	public User(Long id, String firstName, String lastName) {
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.locationNames = new ArrayList<String>();
+		this.fineDustInfoList = new ArrayList<FineDustInfo>();
 	}
 
 	public Long getId() {
@@ -44,27 +46,37 @@ public class User {
 		this.lastName = lastName;
 	}
 
-	public List<String> getLocationNames() {
-		return locationNames;
-	}
-
-	public void setLocationNames(List<String> locationNames) {
-		this.locationNames = locationNames;
-	}
-	
 	public boolean addLocationName(String locationName) {
 		boolean isLocationNameExist = false;
-		
-		for(String name : locationNames) {
-			if(name.equals(locationName)) {
+
+		for(FineDustInfo fineDustInfo : fineDustInfoList) {
+			if(fineDustInfo.getLocationName().equals(locationName)) {
 				isLocationNameExist = true;
 				break;
 			}
 		}
 		
-		if(!isLocationNameExist) this.locationNames.add(locationName);
+		if(!isLocationNameExist) this.fineDustInfoList.add(new FineDustInfo(locationName));
 		
 		return isLocationNameExist;
 	}
-	
+
+
+	public List<FineDustInfo> getFineDustInfoList() {
+		return fineDustInfoList;
+	}
+
+	public void setFineDustInfoList(List<FineDustInfo> fineDustInfoList) {
+		this.fineDustInfoList = fineDustInfoList;
+	}
+
+	@Override
+	public String toString() {
+		return "User{" +
+				"id=" + id +
+				", firstName='" + firstName + '\'' +
+				", lastName='" + lastName + '\'' +
+				", fineDustInfoList=" + fineDustInfoList +
+				'}';
+	}
 }

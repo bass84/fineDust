@@ -11,6 +11,8 @@ import java.net.URLEncoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.paktitucci.fineDust.config.Config;
+import org.paktitucci.fineDust.user.User;
+import org.paktitucci.fineDust.util.textHandler.TextProcessor;
 
 
 public class Report {
@@ -86,7 +88,7 @@ public class Report {
 	}
 	
 	
-	public static JSONArray getFineDustInfo(String stationName) {
+	public static JSONArray getFineDust(String stationName) {
 		JSONArray list = null;
 		String addParam = "&stationName=" + stationName;
 		
@@ -123,30 +125,60 @@ public class Report {
 	
 	
 	
-	public static String getfineDustInfo(String locationName) {
-		JSONObject tmSpot = Report.getTMSpot(locationName).getJSONObject(0);
-		System.out.println("tmSpot = " + tmSpot);
-		
-		JSONObject measuringStation = Report.getNearbyMeasuringStation(tmSpot.getString("tmX"), tmSpot.getString("tmY")).getJSONObject(0);
-		System.out.println("measuringStation = " + measuringStation);
-		
-		JSONObject fineDustInfo = Report.getFineDustInfo(measuringStation.getString("stationName")).getJSONObject(0);
-		System.out.println("fineDustInfo = " + fineDustInfo.toString());
-		
-		String result = fineDustInfo.getString("dataTime") + "에 " + measuringStation.getString("addr") + "에서 측정한 미세먼지 지수는 " + fineDustInfo.getString("pm10Value") + "(으)로 \'" 
-				+ Report.getGrade(fineDustInfo.getString("pm10Grade"))
+	public static String getFineDustInfoResult(String locationName, Long chatId) {
+		JSONObject fineDustInfo = Report.getFineDustInfo(locationName, chatId);
+
+		String result = fineDustInfo.getString("dataTime") + "에 " + fineDustInfo.getString("addr") + "에서 측정한 미세먼지 지수는 " + fineDustInfo.getString("pm10Value") + "(으)로 \'"
+				+ Report.getGrade(fineDustInfo.getString("pm10Grade1h"))
 				+ "\'에 해당합니다.\n\n";
-		
+
 		result += "0 ~ 30 : 좋음\n";
 		result += "31 ~ 80 : 보통\n";
 		result += "81 ~ 150 : 나쁨\n";
 		result += "151 ~  : 매우나쁨\n";
-		
-		System.out.println(result);
-		
+
+        changeFineDustStatus(locationName, chatId, fineDustInfo.getString("pm10Grade1h"));
+
 		return result;
 	}
 
+
+	public static JSONObject getFineDustInfo(String locationName, Long chatId) {
+        JSONObject tmSpot = Report.getTMSpot(locationName).getJSONObject(0);
+        System.out.println("tmSpot = " + tmSpot);
+
+        JSONObject measuringStation = Report.getNearbyMeasuringStation(tmSpot.getString("tmX"), tmSpot.getString("tmY")).getJSONObject(0);
+        System.out.println("measuringStation = " + measuringStation);
+
+        JSONObject fineDustInfo = Report.getFineDust(measuringStation.getString("stationName")).getJSONObject(0);
+        System.out.println("fineDustInfo = " + fineDustInfo.toString());
+        fineDustInfo.put("addr", measuringStation.getString("addr"));
+
+        return fineDustInfo;
+    }
+
+
+
+	public static void changeFineDustStatus(String locationName, Long chatId, String fineDustStatus) {
+        int userIndex = TextProcessor.getUserIndex(chatId);
+        int fineDustInfoIndex = TextProcessor.getFineDustInfoIndex(userIndex, locationName);
+
+        if(userIndex > -1 && fineDustInfoIndex > -1) {
+            TextProcessor.getUserList().get(userIndex).getFineDustInfoList().get(fineDustInfoIndex).setFineDustStatus(fineDustStatus);
+        }
+    }
+
+
+    /*public String getFineDustStatus(String locationName, Long chatId) {
+        int userIndex = TextProcessor.getUserIndex(chatId);
+        int fineDustInfoIndex = TextProcessor.getFineDustInfoIndex(userIndex, locationName);
+
+        if(userIndex > -1 && fineDustInfoIndex > -1) {
+            return TextProcessor.getUserList().get(userIndex).getFineDustInfoList().get(fineDustInfoIndex).getFineDustStatus();
+        }
+        return null;
+
+    }*/
 
 
 	

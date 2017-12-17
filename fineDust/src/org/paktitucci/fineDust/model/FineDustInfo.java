@@ -6,6 +6,8 @@ public class FineDustInfo {
 
     private String fineDustStatus;
 
+    private String fineDustValue;
+
 
     public FineDustInfo() {
 
@@ -32,11 +34,20 @@ public class FineDustInfo {
         this.fineDustStatus = fineDustStatus;
     }
 
+    public String getFineDustValue() {
+        return fineDustValue;
+    }
+
+    public void setFineDustValue(String fineDustValue) {
+        this.fineDustValue = fineDustValue;
+    }
+
     @Override
     public String toString() {
         return "FineDustInfo{" +
                 "locationName='" + locationName + '\'' +
                 ", fineDustStatus='" + fineDustStatus + '\'' +
+                ", fineDustValue='" + fineDustValue + '\'' +
                 '}';
     }
 }

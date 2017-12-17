@@ -11,8 +11,7 @@ import java.net.URLEncoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.paktitucci.fineDust.config.Config;
-import org.paktitucci.fineDust.user.User;
-import org.paktitucci.fineDust.util.textHandler.TextProcessor;
+import org.paktitucci.fineDust.util.textHandler.RegistProcessor;
 
 
 public class Report {
@@ -137,7 +136,7 @@ public class Report {
 		result += "81 ~ 150 : 나쁨\n";
 		result += "151 ~  : 매우나쁨\n";
 
-        changeFineDustStatus(locationName, chatId, fineDustInfo.getString("pm10Grade1h"));
+		changeFineDustInfo(locationName, chatId, fineDustInfo.getString("pm10Grade1h"), fineDustInfo.getString("pm10Value"));
 
 		return result;
 	}
@@ -159,26 +158,17 @@ public class Report {
 
 
 
-	public static void changeFineDustStatus(String locationName, Long chatId, String fineDustStatus) {
-        int userIndex = TextProcessor.getUserIndex(chatId);
-        int fineDustInfoIndex = TextProcessor.getFineDustInfoIndex(userIndex, locationName);
+	public static void changeFineDustInfo(String locationName, Long chatId, String fineDustStatus, String fineDustValue) {
+        int userIndex = RegistProcessor.getUserIndex(chatId);
+        int fineDustInfoIndex = RegistProcessor.getFineDustInfoIndex(userIndex, locationName);
 
         if(userIndex > -1 && fineDustInfoIndex > -1) {
-            TextProcessor.getUserList().get(userIndex).getFineDustInfoList().get(fineDustInfoIndex).setFineDustStatus(fineDustStatus);
+			RegistProcessor.getUserList().get(userIndex).getFineDustInfoList().get(fineDustInfoIndex).setFineDustStatus(fineDustStatus);
+			RegistProcessor.getUserList().get(userIndex).getFineDustInfoList().get(fineDustInfoIndex).setFineDustValue(fineDustValue);
         }
     }
 
 
-    /*public String getFineDustStatus(String locationName, Long chatId) {
-        int userIndex = TextProcessor.getUserIndex(chatId);
-        int fineDustInfoIndex = TextProcessor.getFineDustInfoIndex(userIndex, locationName);
-
-        if(userIndex > -1 && fineDustInfoIndex > -1) {
-            return TextProcessor.getUserList().get(userIndex).getFineDustInfoList().get(fineDustInfoIndex).getFineDustStatus();
-        }
-        return null;
-
-    }*/
 
 
 	

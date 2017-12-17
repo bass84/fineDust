@@ -1,7 +1,6 @@
 package org.paktitucci.fineDust.main;
 
 import org.paktitucci.fineDust.handlers.FineDustHandlers;
-import org.paktitucci.fineDust.util.AlertScheduler;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -20,8 +19,6 @@ public class FineDustMain {
             e.printStackTrace();
         }
 
-        /*AlertScheduler s = new AlertScheduler();
-        s.beepForAnHour();*/
 
 
     }

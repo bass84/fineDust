@@ -1,10 +1,10 @@
 package org.paktitucci.fineDust.handlers;
 
-import java.util.ArrayList;
+
 import java.util.Calendar;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 import org.paktitucci.fineDust.button.Button;
@@ -13,16 +13,15 @@ import org.paktitucci.fineDust.model.FineDustInfo;
 import org.paktitucci.fineDust.report.Report;
 import org.paktitucci.fineDust.user.User;
 import org.paktitucci.fineDust.util.buttonMaker.ButtonMaker;
+import org.paktitucci.fineDust.util.textHandler.RegistProcessor;
 import org.paktitucci.fineDust.util.textHandler.ResponseTextMaker;
-import org.paktitucci.fineDust.util.textHandler.TextProcessor;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
+
 
 public class FineDustHandlers extends TelegramLongPollingBot{
 
@@ -99,25 +98,28 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 
 	public void autoAlertDustInfo() {
 		Calendar cal = Calendar.getInstance();
-		int startMinute = this.getStartMinute(cal.get(Calendar.MINUTE));
+		int startMinute = this.getStartMinute(cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
 
 		final Runnable beeper = new Runnable() {
 			public void run() {
 				JSONObject currentFineDust = null;
 				String returnText = "";
 
-				for(User user : TextProcessor.getUserList()) {
+				for(User user : RegistProcessor.getUserList()) {
 					for(FineDustInfo userFineDust : user.getFineDustInfoList()) {
 						currentFineDust =  Report.getFineDustInfo(userFineDust.getLocationName(), user.getId());
 						String currentDustGrade = currentFineDust.getString("pm10Grade1h");
 						String userDustGrade = userFineDust.getFineDustStatus();
+						String currentDustValue = currentFineDust.getString("pm10Value");
+						String userDustValue = userFineDust.getFineDustValue();
 
 
 						//if(currentDustGrade != null && userDustGrade != null
-						//		&& !currentDustGrade.equals("") && !userDustGrade.equals("") && !currentDustGrade.equals(userDustGrade)) {
-							returnText = "등록하신 지역 " + userFineDust.getLocationName() + "의 미세먼지 지수가 \'" + Report.getGrade(userDustGrade) + "\'에서 \'"
-									+ Report.getGrade(currentDustGrade) + "\'으로 변경되었습니다.\n";
+						//		&& !currentDustGrade.equals("") && !userDustGrade.equals("") && !currentDustValue.equals(userDustValue)) {
+							returnText = "등록하신 지역 " + userFineDust.getLocationName() + "의 미세먼지 지수가 \'" + Report.getGrade(userDustGrade)
+									+ "(" + userDustValue + ")" + "\'에서 \'" + Report.getGrade(currentDustGrade) + "(" + currentDustValue + ")" + "\'으로 변경되었습니다.\n";
 							userFineDust.setFineDustStatus(currentDustGrade);
+							userFineDust.setFineDustValue(currentDustValue);
 
 							SendMessage sendMessage = new SendMessage()
 									.setChatId(user.getId()).setText(returnText);
@@ -134,21 +136,24 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 			}
 		};
 
-		this.scheduler.scheduleAtFixedRate(beeper, startMinute, 20, SECONDS);
+		this.scheduler.scheduleAtFixedRate(beeper, startMinute, 28, TimeUnit.SECONDS);
 	}
 
 
 
 
 
-	private int getStartMinute(int currentMinute) {
-		int scheduleStartMinute = 35;
+	private int getStartMinute(int currentMinute, int currentSecond) {
+		int scheduleStartMinute = 31;
 
-		int startMinute = scheduleStartMinute;
+		int startMinute = (scheduleStartMinute - currentMinute + (scheduleStartMinute - currentMinute < 0 ? 60 : 0)) * 60;
 
-		if((scheduleStartMinute - currentMinute) < 0) {
-			startMinute +=  60;
-		}
+		startMinute -= currentSecond;
+
+		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$currentMinute = " + currentMinute);
+		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$currentSecond = " + currentSecond);
+		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$startMinute = " + startMinute);
+
 		return startMinute;
 	}
 

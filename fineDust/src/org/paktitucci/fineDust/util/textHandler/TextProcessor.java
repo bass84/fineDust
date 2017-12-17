@@ -3,13 +3,9 @@ package org.paktitucci.fineDust.util.textHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONObject;
-import org.paktitucci.fineDust.model.FineDustInfo;
 import org.paktitucci.fineDust.report.Report;
 import org.paktitucci.fineDust.user.User;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 
 public class TextProcessor implements TextProcessable{
@@ -27,7 +23,7 @@ public class TextProcessor implements TextProcessable{
 	@Override
 	public String processText(Message message) {
 
-		if(message.getText().startsWith("#")) {
+		/*if(message.getText().startsWith("#")) {
 			boolean isLocationNameExist = false;
 
 			if(!isHaveUser(message.getChatId())) {
@@ -52,7 +48,7 @@ public class TextProcessor implements TextProcessable{
 
 		}else if(message.getText().equals("/start")) {
 			this.returnText = message.getChat().getFirstName() + " " + message.getChat().getLastName() + "님 미세먼지 알림봇에 들어오신 걸 환영합니다.\n아래의 버튼 메뉴에서 원하는 내용을 선택해주세요.";
-		}
+		}*/
 
 
 		return this.returnText;
@@ -60,31 +56,8 @@ public class TextProcessor implements TextProcessable{
 
 
 
-
-	/*public static String processText() {
-		JSONObject currentFineDust = null;
-		String returnText = "";
-
-		for(User user : userList) {
-			for(FineDustInfo userFineDust : user.getFineDustInfoList()) {
-				currentFineDust =  Report.getFineDustInfo(userFineDust.getLocationName(), user.getId());
-				String currentDustGrade = currentFineDust.getString("pm10Grade1h");
-				String userDustGrade = userFineDust.getFineDustStatus();
-
-				if(currentDustGrade != null && userDustGrade != null
-						&& !currentDustGrade.equals("") && !userDustGrade.equals("") && !currentDustGrade.equals(userDustGrade)) {
-					returnText += "등록하신 지역 " + userFineDust.getLocationName() + "의 미세먼지 지수가 \'" + userDustGrade + "\'에서 \'"
-							+ currentDustGrade + "\'으로 변경되었습니다.\n\n";
-					userFineDust.setFineDustStatus(currentDustGrade);
-
-				}
-			}
-		}
-		return returnText;
-	}*/
-
 	
-	public static boolean isHaveUser(Long id) {
+	/*public static boolean isHaveUser(Long id) {
 		for(User user : userList) {
 			if(user.getId().equals(id)) return true;
 		}
@@ -119,19 +92,7 @@ public class TextProcessor implements TextProcessable{
 
 	public static List<User> getUserList() {
 		return userList;
-	}
+	}*/
 
-
-
-	public String getFineDustStatus(String locationName, Long chatId) {
-		int userIndex = TextProcessor.getUserIndex(chatId);
-		int fineDustInfoIndex = getFineDustInfoIndex(userIndex, locationName);
-
-		if(userIndex > -1 && fineDustInfoIndex > -1) {
-			return TextProcessor.getUserList().get(userIndex).getFineDustInfoList().get(fineDustInfoIndex).getFineDustStatus();
-		}
-		return null;
-
-	}
 
 }

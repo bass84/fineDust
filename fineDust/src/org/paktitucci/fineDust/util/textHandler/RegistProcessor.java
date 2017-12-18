@@ -21,12 +21,12 @@ public class RegistProcessor implements TextProcessable{
     }
 
     @Override
-    public String processText(Message message) {
+    public String processText(Message message, FineDustHandlers fineDustHandlers) {
         boolean isLocationNameExist = false;
 
         if(!isHaveUser(message.getChatId())) {
             this.user = new User(message.getChat().getId(), message.getChat().getFirstName(), message.getChat().getLastName());
-            user.addLocationName(message.getText().substring(1).trim());
+            user.addLocationName(message.getText().trim());
             userList.add(user);
         }else {
             this.user = this.getUser(message.getChatId());
@@ -38,17 +38,17 @@ public class RegistProcessor implements TextProcessable{
         this.fineDustInfo = Report.getFineDustInfoResult(locationName.trim(), message.getChatId());
         
         if(this.fineDustInfo == null) {
-        	this.returnText = userName + "님! 입력하신 지역 \'" + locationName + "\'에 대한 정보가 없습니다.\n다시 아래 메뉴를 선택해주세요.";
+        	this.returnText = userName + "님! 입력하신 지역 \'" + locationName + "\'에 대한 정보가 없습니다.\n지역정보를 다시 입력하시거나 처음으로 돌아가시려면 \'/start\'를 입력하세요";
         }else {
         	if(!isLocationNameExist) {
         		this.returnText = userName + "님 " + locationName + "을 등록하였습니다.\n\n" + this.fineDustInfo;
         	}else {
         		this.returnText = userName + "님! 이미 등록하신 지역입니다.\n\n" + this.fineDustInfo;
         	}
+        	FineDustHandlers.setCurrentButtonInfo(null);
+        	fineDustHandlers.makeButton("/start");
         }
-        
 
-        FineDustHandlers.setCurrentButtonInfo(null);
         
         return this.returnText;
     }

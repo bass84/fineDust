@@ -16,14 +16,17 @@ public class ButtonProcessor implements TextProcessable{
 	
 	
 	@Override
-	public String processText(Message message) {
+	public String processText(Message message, FineDustHandlers fineDustHandlers) {
 		this.userName = message.getChat().getFirstName() + " " + message.getChat().getLastName();
 		
 		if(message.getText().equals(ButtonInfo.INIT_BUTTON_1.getName())) {
 			FineDustHandlers.setCurrentButtonInfo(ButtonInfo.INIT_BUTTON_1);
-			this.returnText = this.userName + "님 님 등록하시고자 하는 지역명을 \'동\' 으로 입력해주세요.\n예) : \'사당동\'";
+			fineDustHandlers.makeButton("");
+			this.returnText = this.userName + "님 등록하시고자 하는 지역명을 \'동\' 으로 입력해주세요.\n예) : \'사당동\'";
 		}else {
+			//FineDustHandlers.setCurrentButtonInfo(null);
 			this.returnText = this.userName + "님 잘못 입력하셨습니다.\n아래의 버튼 메뉴에서 원하는 내용을 선택해주세요.";
+			fineDustHandlers.makeButton("/start");
 		}
 		
 		

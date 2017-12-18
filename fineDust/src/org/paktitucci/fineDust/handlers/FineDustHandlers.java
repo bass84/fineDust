@@ -32,15 +32,17 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 	private static boolean isStart;
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	private static ButtonInfo currentButtonInfo;
+	private Message message;
+	private SendMessage sendMessage = new SendMessage();
 	
 	/*응답 내용 만드는 객체 생성*/
-	private static ResponseTextMaker getResponseTextMaker() {
+	public static ResponseTextMaker getResponseTextMaker() {
 		if(responseTextMaker == null) responseTextMaker = new ResponseTextMaker();
 		return responseTextMaker;
 	}
 	
 	/*버튼 만드는 객체 생성*/
-	private static ButtonMaker getButtonMaker() {
+	public static ButtonMaker getButtonMaker() {
 		if(buttonMaker == null) buttonMaker = new ButtonMaker();
 		return buttonMaker;
 	}
@@ -50,25 +52,22 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 	@Override
 	public void onUpdateReceived(Update update) {
 
-		Message message = update.getMessage();
+		message = update.getMessage();
 		String responseText = "";
 		System.out.println(update.getMessage().getChat().toString());
 		if(update.hasMessage() && update.getMessage().hasText()) {
-			SendMessage sendMessage = new SendMessage()
-	                .setChatId(update.getMessage().getChatId());
+			this.sendMessage.setChatId(update.getMessage().getChatId());
 			
 			/*응답 내용 만드는 객체 얻는다. 객체를 하나만 생성했기 때문에 매번 new하지 않는다.*/
 			responseTextMaker = getResponseTextMaker();
 			/*버튼 만드는 객체 얻는다. 객체를 하나만 생성했기 때문에 매번 new하지 않는다.*/
 			buttonMaker = getButtonMaker();
 			/*응답 내용 얻어온다.*/
-			responseText = responseTextMaker.getResponseText(message);
-			/*버튼 얻어온다.*/
-			this.currentButton = buttonMaker.getCurrentButton(message.getText());
-			/*버튼이 있다면 sendMessage에 set한다.*/
-			if(this.currentButton != null) sendMessage.setReplyMarkup(this.currentButton.getReplyKeyboardMarkup());
+			responseText = responseTextMaker.getResponseText(message, this);
+			/*버튼 만든다.*/
+			//this.makeButton(this.message.getText());
 			/*응답 내용을 sendMessage에 set한다.*/
-			sendMessage.setText(responseText);
+			this.sendMessage.setText(responseText);
 			
 	        try {
 	        	/*응답 내용을 클리이언트에 보낸다.*/
@@ -96,6 +95,13 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 	}
 
 
+	public void makeButton(String message) {
+		/*버튼 얻어온다.*/
+		this.currentButton = buttonMaker.getCurrentButton(message);
+		/*버튼이 있다면 sendMessage에 set한다.*/
+		if(this.currentButton != null) this.sendMessage.setReplyMarkup(this.currentButton.getReplyKeyboardMarkup());
+		else this.sendMessage.setReplyMarkup(null);
+	}
 
 
 	public void autoAlertDustInfo() {
@@ -109,6 +115,7 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 
 				for(User user : RegistProcessor.getUserList()) {
 					for(FineDustInfo userFineDust : user.getFineDustInfoList()) {
+						System.out.println("$$$$$$$$$" + user.toString());
 						currentFineDust =  Report.getFineDustInfo(userFineDust.getLocationName(), user.getId());
 						String currentDustGrade = currentFineDust.getString("pm10Grade1h");
 						String userDustGrade = userFineDust.getFineDustStatus();
@@ -123,12 +130,12 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 							userFineDust.setFineDustStatus(currentDustGrade);
 							userFineDust.setFineDustValue(currentDustValue);
 
-							SendMessage sendMessage = new SendMessage()
-									.setChatId(user.getId()).setText(returnText);
+							SendMessage scheduleSendMessage = new SendMessage()
+								.setChatId(user.getId()).setText(returnText);
 
 							try {
 	        					/*응답 내용을 클리이언트에 보낸다.*/
-								execute(sendMessage);
+								execute(scheduleSendMessage);
 							} catch (TelegramApiException e) {
 								e.printStackTrace();
 							}
@@ -138,7 +145,7 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 			}
 		};
 
-		this.scheduler.scheduleAtFixedRate(beeper, startMinute, 28, TimeUnit.SECONDS);
+		this.scheduler.scheduleAtFixedRate(beeper, startMinute, 20, TimeUnit.SECONDS);
 	}
 
 
@@ -146,15 +153,12 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 
 
 	private int getStartMinute(int currentMinute, int currentSecond) {
-		int scheduleStartMinute = 31;
-
+		int scheduleStartMinute = 48;
 		int startMinute = (scheduleStartMinute - currentMinute + (scheduleStartMinute - currentMinute < 0 ? 60 : 0)) * 60;
-
 		startMinute -= currentSecond;
 
-		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$currentMinute = " + currentMinute);
-		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$currentSecond = " + currentSecond);
-		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$startMinute = " + startMinute);
+		System.out.println("$$$$$$$$$$$$$$ scheduleStartMinute = " + scheduleStartMinute);
+		System.out.println("$$$$$$$$$$$$$$ startMinute = " + startMinute);
 
 		return startMinute;
 	}

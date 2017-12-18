@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.paktitucci.fineDust.button.Button;
 import org.paktitucci.fineDust.config.Config;
 import org.paktitucci.fineDust.model.FineDustInfo;
+import org.paktitucci.fineDust.properties.ButtonInfo;
 import org.paktitucci.fineDust.report.Report;
 import org.paktitucci.fineDust.user.User;
 import org.paktitucci.fineDust.util.buttonMaker.ButtonMaker;
@@ -30,6 +31,7 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 	private static ButtonMaker buttonMaker = new ButtonMaker();
 	private static boolean isStart;
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+	private static ButtonInfo currentButtonInfo;
 	
 	/*응답 내용 만드는 객체 생성*/
 	private static ResponseTextMaker getResponseTextMaker() {
@@ -156,5 +158,18 @@ public class FineDustHandlers extends TelegramLongPollingBot{
 
 		return startMinute;
 	}
+
+	public static ButtonInfo getCurrentButtonInfo() {
+		return currentButtonInfo;
+	}
+
+	public static void setCurrentButtonInfo(ButtonInfo currentButtonInfo) {
+		FineDustHandlers.currentButtonInfo = currentButtonInfo;
+	}
+
+	
+	
+	
+	
 
 }

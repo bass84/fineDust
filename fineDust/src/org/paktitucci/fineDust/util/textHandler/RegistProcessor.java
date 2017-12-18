@@ -1,5 +1,6 @@
 package org.paktitucci.fineDust.util.textHandler;
 
+import org.paktitucci.fineDust.handlers.FineDustHandlers;
 import org.paktitucci.fineDust.report.Report;
 import org.paktitucci.fineDust.user.User;
 import org.telegram.telegrambots.api.objects.Message;
@@ -29,21 +30,26 @@ public class RegistProcessor implements TextProcessable{
             userList.add(user);
         }else {
             this.user = this.getUser(message.getChatId());
-            isLocationNameExist = user.addLocationName(message.getText().substring(1).trim());
+            isLocationNameExist = user.addLocationName(message.getText().trim());
         }
-
 
         String userName = message.getChat().getFirstName() + " " + message.getChat().getLastName();
-        String locationName = message.getText().substring(1);
+        String locationName = message.getText();
         this.fineDustInfo = Report.getFineDustInfoResult(locationName.trim(), message.getChatId());
-
-        if(!isLocationNameExist) {
-            this.returnText = userName + "님 " + locationName + "을 등록하였습니다.\n\n" + this.fineDustInfo;
+        
+        if(this.fineDustInfo == null) {
+        	this.returnText = userName + "님! 입력하신 지역 \'" + locationName + "\'에 대한 정보가 없습니다.\n다시 아래 메뉴를 선택해주세요.";
         }else {
-            this.returnText = userName + "님! 이미 등록하신 지역입니다.\n\n" + this.fineDustInfo;
+        	if(!isLocationNameExist) {
+        		this.returnText = userName + "님 " + locationName + "을 등록하였습니다.\n\n" + this.fineDustInfo;
+        	}else {
+        		this.returnText = userName + "님! 이미 등록하신 지역입니다.\n\n" + this.fineDustInfo;
+        	}
         }
+        
 
-
+        FineDustHandlers.setCurrentButtonInfo(null);
+        
         return this.returnText;
     }
 

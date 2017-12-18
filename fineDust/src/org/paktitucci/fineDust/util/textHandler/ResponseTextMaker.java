@@ -9,6 +9,8 @@ public class ResponseTextMaker {
 	
 	public String getResponseText(Message message) {
 		this.currentProcessor = ProcessorList.getCurrentProcessor(message.getText());
-		return this.currentProcessor.processText(message);
+ 		String result = this.currentProcessor.processText(message);
+ 		
+		return result;
 	}
 }

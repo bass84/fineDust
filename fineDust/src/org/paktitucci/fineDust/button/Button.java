@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.paktitucci.fineDust.properties.ButtonType;
-import org.paktitucci.fineDust.properties.InitButtonInfo;
+import org.paktitucci.fineDust.properties.ButtonInfo;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -19,15 +19,15 @@ public class Button {
         switch(buttonType) {
         	case INIT : 
         		KeyboardRow row = new KeyboardRow();
-                row.add(InitButtonInfo.INIT_BUTTON_1.getName());
+                row.add(ButtonInfo.INIT_BUTTON_1.getName());
                 keyboard.add(row);
                 
                 row = new KeyboardRow();
-                row.add(InitButtonInfo.INIT_BUTTON_2.getName());
+                row.add(ButtonInfo.INIT_BUTTON_2.getName());
                 keyboard.add(row);
                 
                 row = new KeyboardRow();
-                row.add(InitButtonInfo.INIT_BUTTON_3.getName());
+                row.add(ButtonInfo.INIT_BUTTON_3.getName());
                 keyboard.add(row);
                 
                 keyboardMarkup.setKeyboard(keyboard);

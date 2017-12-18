@@ -127,31 +127,46 @@ public class Report {
 	public static String getFineDustInfoResult(String locationName, Long chatId) {
 		JSONObject fineDustInfo = Report.getFineDustInfo(locationName, chatId);
 
-		String result = fineDustInfo.getString("dataTime") + "에 " + fineDustInfo.getString("addr") + "에서 측정한 미세먼지 지수는 " + fineDustInfo.getString("pm10Value") + "(으)로 \'"
-				+ Report.getGrade(fineDustInfo.getString("pm10Grade1h"))
-				+ "\'에 해당합니다.\n\n";
+		String result = "";
+		if(fineDustInfo != null) {
+			result = fineDustInfo.getString("dataTime") + "에 " + fineDustInfo.getString("addr") + "에서 측정한 미세먼지 지수는 " + fineDustInfo.getString("pm10Value") + "(으)로 \'"
+					+ Report.getGrade(fineDustInfo.getString("pm10Grade1h"))
+					+ "\'에 해당합니다.\n\n";
+			result += "0 ~ 30 : 좋음\n";
+			result += "31 ~ 80 : 보통\n";
+			result += "81 ~ 150 : 나쁨\n";
+			result += "151 ~  : 매우나쁨\n";
+			changeFineDustInfo(locationName, chatId, fineDustInfo.getString("pm10Grade1h"), fineDustInfo.getString("pm10Value"));
+		}else {
+			result = null;
+		}
+		
 
-		result += "0 ~ 30 : 좋음\n";
-		result += "31 ~ 80 : 보통\n";
-		result += "81 ~ 150 : 나쁨\n";
-		result += "151 ~  : 매우나쁨\n";
-
-		changeFineDustInfo(locationName, chatId, fineDustInfo.getString("pm10Grade1h"), fineDustInfo.getString("pm10Value"));
 
 		return result;
 	}
 
 
 	public static JSONObject getFineDustInfo(String locationName, Long chatId) {
-        JSONObject tmSpot = Report.getTMSpot(locationName).getJSONObject(0);
-        System.out.println("tmSpot = " + tmSpot);
+		JSONObject tmSpot = null;
+		if(Report.getTMSpot(locationName) != null && Report.getTMSpot(locationName).length() > 0) {
+			tmSpot = Report.getTMSpot(locationName).getJSONObject(0);
+			System.out.println("tmSpot = " + tmSpot);
+		}else return null;
 
-        JSONObject measuringStation = Report.getNearbyMeasuringStation(tmSpot.getString("tmX"), tmSpot.getString("tmY")).getJSONObject(0);
-        System.out.println("measuringStation = " + measuringStation);
-
-        JSONObject fineDustInfo = Report.getFineDust(measuringStation.getString("stationName")).getJSONObject(0);
-        System.out.println("fineDustInfo = " + fineDustInfo.toString());
-        fineDustInfo.put("addr", measuringStation.getString("addr"));
+        JSONObject measuringStation = null;
+        if(Report.getNearbyMeasuringStation(tmSpot.getString("tmX"), tmSpot.getString("tmY")) != null && Report.getNearbyMeasuringStation(tmSpot.getString("tmX"), tmSpot.getString("tmY")).length() > 0) {
+        	measuringStation = Report.getNearbyMeasuringStation(tmSpot.getString("tmX"), tmSpot.getString("tmY")).getJSONObject(0);
+        	System.out.println("measuringStation = " + measuringStation);
+        	
+        }else return null;
+        
+        JSONObject fineDustInfo = null;
+        if(Report.getFineDust(measuringStation.getString("stationName")) != null && Report.getFineDust(measuringStation.getString("stationName")).length() > 0) {
+        	fineDustInfo = Report.getFineDust(measuringStation.getString("stationName")).getJSONObject(0);
+        	System.out.println("fineDustInfo = " + fineDustInfo.toString());
+        	fineDustInfo.put("addr", measuringStation.getString("addr"));
+        }else return null;
 
         return fineDustInfo;
     }
